@@ -1,0 +1,14 @@
+pandas==1.5.3
+numpy==1.25.2
+pyarrow==12.0.1
+SQLAlchemy>=1.4,<2.0
+psycopg2-binary==2.9.9
+requests
+python-dotenv
+#boto3
+jupyterlab
+notebook
+ipykernel
+fsspec==2024.2.0
+s3fs==2024.2.0
+fastparquet==2024.2.0

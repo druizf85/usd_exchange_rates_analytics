@@ -1,0 +1,125 @@
+services:
+  postgres_airflow:
+    image: postgres:15
+    container_name: postgres_airflow
+    environment:
+      POSTGRES_USER: ${AIRFLOW_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AIRFLOW_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${AIRFLOW_POSTGRES_DB}
+    volumes:
+      - postgres_airflow_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  airflow:
+    image: apache/airflow:2.9.2               
+    container_name: airflow
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor   
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_POSTGRES_USER}:${AIRFLOW_POSTGRES_PASSWORD}@postgres_airflow:5432/${AIRFLOW_POSTGRES_DB}
+    depends_on:
+      - postgres_airflow                      
+    ports:
+      - "8085:8080"                           
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./requirements-airflow.txt:/requirements-airflow.txt
+      - ./.env:/.env:ro                      
+      - .:/opt/project                        
+      - /var/run/docker.sock:/var/run/docker.sock 
+    
+    command: >
+      bash -c "
+        pip install --no-cache-dir -r /requirements-airflow.txt &&  # Solo instala el Provider Docker
+        airflow db init &&
+        airflow users create --username $AIRFLOW_ADMIN_USER --firstname $AIRFLOW_ADMIN_FIRSTNAME --lastname $AIRFLOW_ADMIN_LASTNAME --role Admin --email $AIRFLOW_ADMIN_EMAIL --password $AIRFLOW_ADMIN_PASSWORD &&
+        airflow webserver"
+    
+    restart: unless-stopped
+
+  airflow-scheduler:
+    image: apache/airflow:2.9.2
+    container_name: airflow_scheduler
+    depends_on:
+      - postgres_airflow                  
+      - airflow                              
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor  
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_POSTGRES_USER}:${AIRFLOW_POSTGRES_PASSWORD}@postgres_airflow:5432/${AIRFLOW_POSTGRES_DB}
+    volumes:                             
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./requirements-airflow.txt:/requirements-airflow.txt
+      - ./.env:/.env:ro                     
+      - .:/opt/project        
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      bash -c "
+        pip install --no-cache-dir -r /requirements-airflow.txt &&  # Solo instala el Provider Docker
+        airflow scheduler"
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" 
+      - "9001:9001" 
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+
+  postgres_dw:
+    image: postgres:15
+    container_name: postgres_dw
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_dw_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    depends_on:
+      - postgres_dw
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    restart: unless-stopped
+
+  etl_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.etl
+    container_name: etl_worker
+    ports:
+      - "8888:8888"
+    depends_on:
+      - minio
+      - postgres_dw
+    volumes:
+      - .:/app 
+      - ./.env:/.env:ro 
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+volumes:
+  postgres_airflow_data:
+  postgres_dw_data:
+  pgadmin_data:
+  minio_data:

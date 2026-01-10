@@ -1,0 +1,6 @@
+.env
+
+others/
+.ipynb_checkpoints/
+
+.pbix
