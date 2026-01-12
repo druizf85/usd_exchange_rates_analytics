@@ -1,9 +1,7 @@
-💱 Exchange Rates Analytics Pipeline
+💱 Exchange Rates Analytics Pipeline -> Daily Currency Conversion & USD Strength Analysis
 
-Daily Currency Conversion & USD Strength Analysis
 
-📌 Project Overview
-
+📌 Project Overview: 
 This project implements a production-style ELT data pipeline for daily exchange rate analysis, designed to showcase modern Data Engineering best practices:
 
 - Containerized infrastructure with Docker
@@ -14,9 +12,8 @@ This project implements a production-style ELT data pipeline for daily exchange 
 
 The pipeline ingests daily currency exchange rates, processes them through structured layers, and exposes business-ready analytical views for geo-economic insights and USD strength analysis.
 
-💡 Main Idea
 
-Daily analysis of exchange rates and currency conversion against USD, enabling:
+💡 Main Idea: Daily analysis of exchange rates and currency conversion against USD, enabling:
 
 - Historical tracking of exchange rates
 - Currency appreciation and depreciation analysis
@@ -24,11 +21,8 @@ Daily analysis of exchange rates and currency conversion against USD, enabling:
 - Geographic exposure (continent & country level)
 - SQL-based analytics ready for Power BI consumption
 
-🌍 Data Source
-ExchangeRate API
 
-Provider: ExchangeRate-API
-
+🌍 Data Source: ExchangeRate API
 Endpoint: GET https://v6.exchangerate-api.com/v6/YOUR_API_KEY/latest/USD
 
 
@@ -58,6 +52,7 @@ Power BI / Analytics
 | BI              | Microsoft Power BI      |
 | Metadata DB     | PostgreSQL (Airflow)    |
 
+
 🔄 ELT Flow by Layer
 
 🥉 Bronze — Raw Ingestion
@@ -86,7 +81,7 @@ Purpose: Transform raw data into an analytical format.
 
 🥇 Gold — Analytical Models (SQL)
 
-Business-oriented SQL views designed for BI consumption:
+Business-oriented SQL views designed for BI consumption. These views act as the semantic layer for analytics, mainly focused on these aspects:
 
 - Currency appreciation & depreciation
 - Monthly and yearly volatility
@@ -94,7 +89,45 @@ Business-oriented SQL views designed for BI consumption:
 - Latest exchange rate snapshot
 - Geo-economic USD exposure
 
-These views act as the semantic layer for analytics.
+Analytical SQL Views
+
+1. USD Strength by Continent
+
+- Average USD exchange rate
+- Volatility by continent
+- Currency coverage per region
+
+2. Currency Appreciation / Depreciation
+
+- Daily deltas using window functions
+- Identifies appreciating vs depreciating currencies
+
+3. Currency Volatility Analysis
+
+- Monthly volatility (e.g. October / November)
+- Full-year performance
+- Min / Max / Average values
+
+4. Geo-Economic USD Exposure
+
+- Country and continent exposure
+- USD volatility and range movement
+
+5. Latest Exchange Rate Snapshot
+
+- Most recent valid exchange rate per currency
+- Cleaned and BI-ready
+
+📊 Microsoft Power BI Integration: PostgreSQL DirectQuery
+
+Visual Tools:
+
+- USD strength by continent
+- Currency volatility ranking
+- Daily exchange rate trends
+- Regional exposure analysis
+
+
 
 🧠 Orchestration with Airflow
 DAG: exchange_rates_pipeline
@@ -111,53 +144,6 @@ Task Flow:    bronze_task → silver_task
 | silver_task | Normalization → PostgreSQL |
 
 
-📊 Analytical SQL Views (Gold Layer)
-🌎 USD Strength by Continent
-
-continent_usd_strength_view
-
-- Average USD exchange rate
-- Volatility by continent
-- Currency coverage per region
-
-📉 Currency Appreciation / Depreciation
-
-currency_appreciation_depreciation_view
-
-- Daily deltas using window functions
-- Identifies appreciating vs depreciating currencies
-
-🌪️ Currency Volatility Analysis
-
-currency_volatility_view
-
-- Monthly volatility (e.g. October / November)
-- Full-year performance
-- Min / Max / Average values
-
-🧭 Geo-Economic USD Exposure
-
-geoeconomic_usd_exposure_view
-
-- Country and continent exposure
-- USD volatility and range movement
-
-⏱️ Latest Exchange Rate Snapshot
-
-latest_exchange_rate_view
-
-- Most recent valid exchange rate per currency
-- Cleaned and BI-ready
+📈 Project Impact:
 
 
-📈 Microsoft Power BI Integration
-
-PostgreSQL DirectQuery
-
-Visual Tools:
-
-- USD strength by continent
-- Currency volatility ranking
-- Daily exchange rate trends
-
-- Regional exposure analysis
