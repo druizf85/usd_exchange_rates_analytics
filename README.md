@@ -34,7 +34,7 @@ ExchangeRate API
         ↓
 [ Silver ] → PostgreSQL Data Warehouse (Normalized rates)
         ↓
-[ Gold ]   → SQL Views / dbt-ready models
+[ Gold ]   → SQL Views
         ↓
 Power BI / Analytics
 
@@ -48,7 +48,7 @@ Power BI / Analytics
 | Data Lake       | MinIO (S3-compatible)   |
 | Processing      | Python (Pandas, s3fs)   |
 | Data Warehouse  | PostgreSQL              |
-| Transformations | SQL (dbt-ready)         |
+| Transformations | SQL views        |
 | BI              | Microsoft Power BI      |
 | Metadata DB     | PostgreSQL (Airflow)    |
 
@@ -145,5 +145,6 @@ Task Flow:    bronze_task → silver_task
 
 
 📈 Project Impact:
+
 
 
