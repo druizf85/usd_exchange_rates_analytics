@@ -23,7 +23,7 @@ The pipeline ingests daily currency exchange rates, processes them through struc
 
 
 🌍 Data Source: ExchangeRate API
-Endpoint: GET https://v6.exchangerate-api.com/v6/YOUR_API_KEY/latest/USD
+Endpoint: GET https://v6.exchangerate-api.com/v6/API_KEY/latest/USD
 
 
 🏗️ Architecture Overview
@@ -145,6 +145,7 @@ Task Flow:    bronze_task → silver_task
 
 
 📈 Project Impact:
+
 
 
 
