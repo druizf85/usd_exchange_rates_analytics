@@ -6,4 +6,5 @@ others/
 logs/
 plugins/
 
-.pbix
+*.pbix
+*.ipynb
